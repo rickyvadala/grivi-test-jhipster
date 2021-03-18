@@ -1,0 +1,175 @@
+
+entity Region {
+	regionName String
+}
+
+entity Country {
+	countryName String
+}
+
+// an ignored comment
+/** not an ignored comment */
+entity Location {
+	streetAddress String,
+    streetNumber Long,
+	postalCode String,
+	city String,
+	stateProvince String
+}
+
+entity LocationType {
+	name String,
+    description String
+}
+
+entity Department {
+	departmentName String required
+}
+
+enum Language {
+    FRENCH, ENGLISH, SPANISH
+}
+
+entity Person {
+	firstName String,
+    lastName String,
+    birthDate Instant,
+    phoneNumber Long
+}
+
+entity Company {
+	name String,
+    description String
+}
+
+entity ChannelSubscription {
+	person Person,
+    channel Channel
+}
+
+entity Channel {
+	name String,
+    category Long,
+    profesion Long
+}
+
+entity Post {
+	text String,
+    photoUrl String
+}
+
+entity Comment {
+	postIdFrom Long,
+    postId Long
+}
+
+entity Friendship {
+	personOrigin Long,
+    personAddressee Long
+}
+
+entity Notification {
+	channel Long required,
+    post Long,
+    review Long,
+    reaction Long 
+}
+
+entity Profesion {
+	name String,
+    description String,
+    category Long
+}
+
+entity Category {
+	name String,
+    description String
+}
+
+entity ProviderProfesion {
+	provider Long,
+    profesion Long
+}
+
+entity Question {
+	name String,
+    text String
+}
+
+entity ReviewQuestion {
+	enabled Boolean
+}
+
+entity Reaction {
+	type String,
+    post Long,
+    person Long
+}
+
+entity Review {
+	avgRate Double,
+    date Instant    
+}
+
+entity ReviewDetail {
+	rate Long
+}
+
+relationship OneToOne {
+	Location{country} to Country
+    Country{region} to Region
+    Department{location} to Location
+}
+
+relationship ManyToMany {
+    Person{company} to Company{person}
+    Person{location} to Location{person}
+    Channel{person} to Person{channel}
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	LocationType to Location{type}
+    Person to Friendship{person(personOrigin)}
+    Person to Friendship{person(personAddressee)}
+    Person to ChannelSubscription{Person(channelSubscription)}
+    Person to ProviderProfesion{person(provider)}
+    Person to Reaction{person(person)}
+    Post to Notification{post(post)}
+    Post to Reaction{post(post)}
+    Post to Comment{post(postIdFrom)}
+    Post to Comment{post(postId)}
+    Review to Notification{review(review)}
+    Review to ReviewDetail{review(review)}
+    Notification to ReviewDetail{question(question)}
+    Reaction to Notification{reaction(reaction)}
+    Channel to ChannelSubscription{channel(channel)}
+    Channel to Notification{channel(channel)}
+    Category to Channel{category(category)}
+    Category to Profesion{category(category)}
+    Profesion to Channel{profesion(profesion)}
+    Profesion to ProviderProfesion{profesion(profesion)}
+    Person to Review{client(person)}
+    Person to Review{provider(person)}
+    Question to ReviewQuestion{question(question)}
+    Category to ReviewQuestion{category(category)}
+    Profesion to ReviewQuestion{profesion(profesion)}
+    ProviderProfesion to ReviewQuestion{providerProfesion(providerProfesion)}
+}
+
+relationship ManyToOne {
+	Employee{manager} to Employee
+}
+
+// Set pagination options
+paginate JobHistory, Employee with infinite-scroll
+paginate Job with pagination
+
+// Use Data Transfer Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Employee, Job
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
